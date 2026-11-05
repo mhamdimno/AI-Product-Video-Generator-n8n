@@ -1,0 +1,444 @@
+{
+  "name": "AI Product Video Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "29b4601e-94b3-4430-b6c5-728b02edced6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1tiDDBbQa2ZHV0mtgL4py5hke9n0kj9vBWww_o7lihig",
+          "mode": "list",
+          "cachedResultName": "Videos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tiDDBbQa2ZHV0mtgL4py5hke9n0kj9vBWww_o7lihig/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tiDDBbQa2ZHV0mtgL4py5hke9n0kj9vBWww_o7lihig/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f723e089-bdf3-44c4-a1a9-9ebfdfb7f709",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "61492K1ROqaFiIho",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 7036072219b5780c258c0de184613a51"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=\n{\n  \"model\": \"grok-imagine-video-1-5-preview\",\n  \"input\": {\n    \"prompt\": \"{{ $json.output.replace(/\\r?\\n/g, ' ').replace(/\"/g, '\\\\\\\"') }}\",\n    \"image_urls\": [\n     \"{{ $('Get row(s) in sheet').item.json['Product Photo'] }}\"\n    ],\n    \"aspect_ratio\": \"9:16\",\n    \"resolution\": \"480p\",\n    \"duration\": 5\n  }\n }\n\n",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        848,
+        0
+      ],
+      "id": "69fe48ee-4390-4a6c-8195-5441eb7d720c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        208
+      ],
+      "id": "de1ffd7a-9761-4f72-9131-ec30382a9fd4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "e818dd7b-1d54-4a2b-902a-ece152ea2ebe",
+      "name": "Wait",
+      "webhookId": "70f65c52-9672-44a3-9920-688d3a7e6d5a"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $('HTTP Request').item.json.data.taskId }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1328,
+        0
+      ],
+      "id": "6af06d80-301f-4fda-967f-e223be56ec55",
+      "name": "Get Sora Video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "RxNvLqftGY9TlUMG",
+          "name": "Kie"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "dbe665ff-bcbb-4b20-b013-596046f7f22c",
+              "leftValue": "={{ $json.msg }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1552,
+        0
+      ],
+      "id": "448c171b-d627-4fb4-a2f2-e535f5cfc02b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tiDDBbQa2ZHV0mtgL4py5hke9n0kj9vBWww_o7lihig",
+          "mode": "list",
+          "cachedResultName": "Videos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tiDDBbQa2ZHV0mtgL4py5hke9n0kj9vBWww_o7lihig/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tiDDBbQa2ZHV0mtgL4py5hke9n0kj9vBWww_o7lihig/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Product": "={{ $('Get row(s) in sheet').item.json.Product }}",
+            "Status": "Finished",
+            "Finished Video": "={{ $('Get Sora Video').item.json.data.response.resultUrls[0] }}"
+          },
+          "matchingColumns": [
+            "Product"
+          ],
+          "schema": [
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product Photo",
+              "displayName": "Product Photo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ICP",
+              "displayName": "ICP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Product Features",
+              "displayName": "Product Features",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Video Setting",
+              "displayName": "Video Setting",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Finished Video",
+              "displayName": "Finished Video",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1920,
+        -16
+      ],
+      "id": "02137a1f-815b-4fe7-93d5-93205d903eed",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "61492K1ROqaFiIho",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nProduct Name:\n{{ $json.Product }}\nIdeal Customer Profile:\n{{ $json.ICP }}\nProduct Features:\n{{ $json[\"Product Features\"] }}\nVideo Setting:\n{{ $json[\"Video Setting\"] }}\nReference Image URL:\n{{ $json[\"Product Photo\"] }}",
+        "options": {
+          "systemMessage": "# Role\nYou are an expert UGC Video Prompt Engineer specializing in realistic, high-quality product videos optimized for Grok Imagine Video.\n\nYour task is to generate ONE production-ready image-to-video prompt using the product information and reference image.\n\n# Input Information\nYou will receive:\n- Product Name\n- Ideal Customer Profile (ICP)\n- Product Features\n- Video Setting\n- Product Reference Image\n\n# 1. LANGUAGE REQUIREMENTS — CRITICAL\n- All spoken dialogue MUST be in Arabic.\n- Default spoken language: Natural Egyptian Arabic dialect.\n- Never generate English dialogue unless explicitly requested in the Video Setting.\n- The final technical video prompt must be written in English, but clearly specify that all audible speech must be Arabic.\n- Arabic speech must sound natural, fluent, and correctly pronounced.\n- Do not use English words in the spoken dialogue unless they are actual product names.\n\n# 2. HUMAN SUBJECT — GENDER REQUIREMENTS\n- The default human subject MUST be MALE.\n- Never generate a female influencer, woman, girl, or female hands.\n- For Islamic products, use a believable Muslim male appearance and culturally appropriate modest clothing.\n- Prefer a natural-looking adult Arab man when appropriate for the ICP.\n- The subject must have realistic masculine facial features and hands.\n- Do not introduce women in the background or reflections.\n\n# 3. UGC CAMERA STYLE\n- Use a realistic front-facing selfie camera perspective.\n- Vertical 9:16 composition unless Video Setting specifies otherwise.\n- Natural handheld movement and realistic framing.\n- The male subject holds the phone out of frame with one hand and demonstrates the product with the other.\n- The phone and recording equipment must NEVER appear.\n- Keep the face and product clearly visible.\n\n# 4. PRODUCT ACCURACY\nThe reference image is the authoritative visual source.\n\n- Preserve the exact product shape, color, proportions, materials, buttons, screen, labels, and distinctive details.\n- Do not redesign or invent product features.\n- Keep the product consistent throughout the video.\n- Do not distort hands, fingers, or product interactions.\n- Do not invent screen content, numbers, or animations.\n\n# 5. ENVIRONMENT\nChoose a realistic environment based on the product and Video Setting.\n\nFor Islamic products:\n- Use a tasteful, modest, realistic environment.\n- A quiet prayer corner or simple home setting may be appropriate.\n- Avoid excessive decoration and stereotypical visual elements.\n- Do not include women.\n\n# 6. DIALOGUE\n- Generate one or two short sentences in natural Egyptian Arabic.\n- The male subject speaks directly to the camera.\n- Mention a real product feature and a relevant practical benefit.\n- Do not make unsupported religious, medical, or performance claims.\n- Dialogue must fit comfortably within the video duration.\n- If the duration is too short, prioritize the product demonstration over dialogue.\n- Follow silent-video instructions if specified.\n\nExample dialogue style:\n\"بستخدم السبحة دي في الذكر اليومي، وحجمها عملي جدًا والشاشة بتخليني أتابع العد بسهولة.\"\n\nUse this only as a style example, not mandatory dialogue.\n\n# 7. VIDEO DURATION & ACTION\n- Follow the exact duration and aspect ratio in Video Setting.\n- For short videos (5 seconds), use one continuous shot and one simple product interaction.\n- Avoid complicated movements and multiple scene transitions.\n- Use only one primary camera movement.\n- End with a stable, clear product view.\n- Do not force fade-to-black.\n\n# 8. CREATIVE DIRECTION\n- Follow the requested Video Setting.\n- If it requests UGC, use authentic selfie-style recording.\n- If it requests cinematic advertising, follow that direction instead.\n\nmax 1000char\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4da678fd-364b-4a08-86cd-cd04f231c367",
+      "name": "Prompt Generator"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Prompt Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Prompt Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Sora Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sora Video": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Generator": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "423bedc3-56c5-480e-9468-853c4c922aec",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77308056015361e52b38fa4366ffed04d64e6edd776006f972cf6cdce0b5cd5e"
+  },
+  "nodeGroups": [],
+  "id": "v5NVncW6TEx59hex",
+  "tags": []
+}
