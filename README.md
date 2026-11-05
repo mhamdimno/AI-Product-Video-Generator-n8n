@@ -13,11 +13,11 @@ No manual video editing is required.
 
 Watch the full project walkthrough on YouTube:
 
-[![Watch the Demo](https://img.youtube.com/vi/30fqafoE4Co/maxresdefault.jpg)](https://youtu.be/30fqafoE4Co)
+[![Watch the Demo](https://youtu.be/30fqafoE4Co)
 
 ## 🔄 Workflow Preview
 
-![n8n Workflow Preview](docs/workflow-overview.png)
+![n8n Workflow Preview](chrome_qXZfmClBlg.png)
 ## Workflow Architecture
 
 ```text
