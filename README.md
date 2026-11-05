@@ -9,12 +9,10 @@ This workflow automates the process of creating short promotional videos from pr
 Simply add a product's information and image to Google Sheets. The AI Agent analyzes the product details and generates a tailored video prompt. The workflow then sends the prompt and reference image to an AI video generation API, waits for the generation process to complete, and saves the resulting video URL back into the same Google Sheets row.
 
 No manual video editing is required.
+
 ## 🎥 Project Demo
 
-Watch the full project walkthrough on YouTube:
-
-[![Watch the Demo](https://youtu.be/30fqafoE4Co)
-
+[![Watch the Demo](https://img.youtube.com/vi/30fqafoE4Co/0.jpg)](https://youtu.be/30fqafoE4Co)
 ## 🔄 Workflow Preview
 
 ![n8n Workflow Preview](chrome_qXZfmClBlg.png)
