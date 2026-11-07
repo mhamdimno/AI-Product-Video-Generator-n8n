@@ -12,7 +12,7 @@ No manual video editing is required.
 
 ## 🎥 Project Demo
 
-[![Watch the Demo](https://img.youtube.com/vi/30fqafoE4Co/0.jpg)](https://youtu.be/30fqafoE4Co)
+[![Watch the Demo](https://img.youtube.com/vi/d0R7HBc9tRg/0.jpg)](https://youtu.be/d0R7HBc9tRg)
 ## 🔄 Workflow Preview
 
 ![n8n Workflow Preview](chrome_qXZfmClBlg.png)
